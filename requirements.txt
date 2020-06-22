@@ -1,0 +1,11 @@
+tensorflow
+tensorflow-estimator
+tensorflow-probability
+gym
+chainerrl
+tqdm
+cpprb
+opencv-python
+pyyaml
+wandb
+minerl

@@ -1,0 +1,41 @@
+env:
+  env_id: "Acrobot-v1"
+  frame_skip: 1
+  frame_stack: 1
+
+buffer:
+  cpp: False
+  size: 100000
+  episodes_to_decay: 50
+  min_demo_proportion: 0.0
+model_name: "flat_dqfd"
+
+agent:
+  frames_to_update: 100
+  save_dir: "train"
+  update_quantity: 100
+  update_target_net_mod: 2000
+  batch_size: 32
+  margin: 0.4
+  replay_start_size: 500
+  gamma: 0.99
+  learning_rate: 0.0001
+  n_step: 10
+
+loader:
+  data_path: "demonstrations/Acrobot-v1_-500.npz"
+tb_dir: "train/tboard/"
+
+pretrain:
+  steps: 100000
+
+train:
+  episodes: 200
+  name: "max_model.ckpt"
+  save_mod: 50
+
+
+
+
+
+
