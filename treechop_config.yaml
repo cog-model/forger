@@ -26,3 +26,4 @@ pretrain:
   steps: 150000
   min_demo_reward: 60.0
 
+episodes: 200
