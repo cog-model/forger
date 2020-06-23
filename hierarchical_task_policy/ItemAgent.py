@@ -388,7 +388,6 @@ class ItemAgent:
             print()
             print(f'Pre-training {node.name} agent')
             node.pov_agent.agent.pre_train(pretrain_config['steps'])
-            node.pov_agent.agent.replay_buff.free_demo()
             node.pov_agent.save_agent()
             self.pov_agents[node.name] = node.pov_agent
 

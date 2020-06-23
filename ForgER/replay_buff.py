@@ -206,12 +206,17 @@ class AggregatedBuff:
     def free_demo(self):
         self.demo_buff = PrioritizedReplayBuffer(**self.demo_kwargs)
 
-    def sample(self, n=32, beta=0.4):
+    @property
+    def proportion(self):
         if self.episodes_to_decay == 0:
             proportion = 1. - self.min_demo_proportion
         else:
             proportion = min(1. - self.min_demo_proportion, self.episodes_done/self.episodes_to_decay)
-        agent_n = int(n*proportion)
+        proportion = max(proportion, float(self.demo_buff.get_stored_size() == 0))
+        return proportion
+
+    def sample(self, n=32, beta=0.4):
+        agent_n = int(n*self.proportion)
         demo_n = n - agent_n
         if demo_n > 0 and agent_n > 0:
             demo_samples = self.demo_buff.sample(demo_n, beta)
@@ -227,11 +232,7 @@ class AggregatedBuff:
 
     def update_priorities(self, indexes, priorities):
         n = len(indexes)
-        if self.episodes_to_decay == 0:
-            proportion = 1. - self.min_demo_proportion
-        else:
-            proportion = min(1. - self.min_demo_proportion, self.episodes_done / self.episodes_to_decay)
-        agent_n = int(n * proportion)
+        agent_n = int(n * self.proportion)
         demo_n = n - agent_n
         if demo_n != 0:
             self.demo_buff.update_priorities(indexes[agent_n:], priorities[agent_n:])

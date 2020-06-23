@@ -41,8 +41,8 @@ def run_train(file_name):
     train_config = config['train_agent']
     item_agent.pre_train(agent_config, buffer_config, wrapper_config,
                          train_config['env_name'], train_config['pretrain'])
-
-    pipeline.run_pipeline(file_name)
+    if 'log_agent_pipeline' in config:
+        pipeline.run_pipeline(file_name)
 
     item_agent.train(agent_config, buffer_config, wrapper_config, train_config['env_name'], **train_config['train'])
 
