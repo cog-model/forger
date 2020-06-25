@@ -25,7 +25,9 @@ def run_train(file_name):
 
     with open(file_name, "r") as config_file:
         config = yaml.load(config_file, Loader=yaml.FullLoader)
-
+    
+    if not os.path.isdir('train'):
+        os.mkdir('train')
     with open('train/chain.json', "w") as f:
         json.dump(final_chain, f)
 
