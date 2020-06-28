@@ -110,7 +110,6 @@ class ObtainPoVWrapper(gym.ObservationWrapper):
 class DiscreteBase(gym.Wrapper):
     def __init__(self, env):
         super(DiscreteBase, self).__init__(env)
-        self.env = env
         self.action_dict = {}
         self.action_space = gym.spaces.Discrete(len(self.action_dict))
 

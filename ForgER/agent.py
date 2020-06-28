@@ -94,7 +94,7 @@ class Agent:
                 self.update(self.update_quantity)
         return score, counter
 
-    def test(self, env, name="train/max_model.ckpt", number_of_trials=1, render=False, collect=None):
+    def test(self, env, name="train/max_model.ckpt", number_of_trials=1, render=False):
         if name:
             self.load(name)
 
@@ -109,8 +109,6 @@ class Agent:
 
             while not done:
                 action = self.choose_act(observation)
-                if collect:
-                    collected.append(collect(observation))
                 observation, r, done, _ = env.step(action)
                 if render:
                     env.render()
@@ -120,8 +118,6 @@ class Agent:
                 reward += r
             total_reward += reward
         env.reset()
-        if collect:
-            return total_reward, collected
         return total_reward
 
     def pre_train(self, steps=150000):

@@ -56,7 +56,6 @@ class CraftInnerWrapper(gym.Wrapper):
         """
         super().__init__(env)
         self.crafts_agent = crafts_agent
-        self.last_observation = None
 
     def step(self, action):
         """
@@ -67,17 +66,7 @@ class CraftInnerWrapper(gym.Wrapper):
         craft_action = self.crafts_agent.get_crafting_action()
         action = {**action, **craft_action}
         observation, reward, done, info = self.env.step(action)
-        self.last_observation = observation
         return observation, reward, done, info
-
-    def reset(self, **kwargs):
-        """
-        :param kwargs:
-        :return:
-        """
-        if self.last_observation is None:
-            self.last_observation = self.env.reset(**kwargs)
-        return self.last_observation
 
 
 class RememberFullTrajectoryWrapper(gym.Wrapper):
@@ -106,22 +95,16 @@ class RememberFullTrajectoryWrapper(gym.Wrapper):
 
 
 class InnerEnvWrapper(gym.Wrapper):
-    def __init__(self, env, item, count):
+    def __init__(self, env, item, count, last_observation):
         super().__init__(env)
         self.item = item
         self.count = count
         self.previous_count = None
         self.is_core_env_done = None
-        self.last_observation = None
+        self.last_observation = last_observation
 
     def reset(self, **kwargs):
-        if self.last_observation is None:
-            self.last_observation = self.env.reset(**kwargs)
         return self.last_observation
-
-    def force_reset(self, **kwargs):
-        self.last_observation = None
-        return self.reset(**kwargs)
 
     def step(self, action):
         state, reward, done, _ = self.env.step(action)
@@ -253,7 +236,6 @@ class ItemAgent:
         nodes_names = [item for item in chain if cls.is_item(item)]
 
         craft_agents = []
-        pov_agent_dict = {}
         for node_name in nodes_names:
             craft_agents.append(LoopCraftingAgent(cls.get_crafting_actions_from_chain(chain, node_name)))
 
@@ -265,8 +247,6 @@ class ItemAgent:
                                                  count_=int(count),
                                                  pov_agent=None,
                                                  crafting_agent=craft_agents[index])
-            if name in pov_agent_dict.keys():
-                nodes_dict[name].pov_agent = pov_agent_dict[name]
 
             nodes.append(nodes_dict[name])
         return nodes
@@ -285,38 +265,36 @@ class ItemAgent:
         :param eps_kwargs: epsilon
         :return:
         """
-        pov_agents_dict = {}
         save_video_wrapper = SaveVideoWrapper(gym.make(env_name))
         core_env = ActionNoiseWrapper(InventoryPrintWrapper(save_video_wrapper))
         t_env = make_env(core_env, **wrapper_config)
         env_dict, dtype_dict = get_dtype_dict(t_env)
         wandb = agent_config["wandb"]
         for node in self.nodes:
-            if node.name not in pov_agents_dict:
+            if node.name not in self.pov_agents:
                 print('----' * 10)
                 print(f"loading {node.name} agent")
-                pov_agents_dict[node.name] = RfDAgent(env_dict=env_dict,
+                self.pov_agents[node.name] = RfDAgent(env_dict=env_dict,
                                                       item_dir='train/' + node.name,
                                                       agent_config=agent_config, buffer_config=buffer_config,
                                                       build_model=get_network_builder('minerl_dqfd'),
                                                       obs_space=t_env.observation_space, act_space=t_env.action_space,
                                                       dtype_dict=dtype_dict, **eps_kwargs)
-            node.pov_agent = pov_agents_dict[node.name]
-            node.pov_agent.load_agent()
+                self.pov_agents[node.name].load_agent()
+            node.pov_agent = self.pov_agents[node.name]
         for episode in range(episodes):
             current_node_index = 0
             for agent in self.nodes:
                 agent.crafting_agent.reset_index()
-            core_env.reset()
+            last_observation = core_env.reset()
             while True:
                 current_node = self.nodes[current_node_index]
                 print('\n', current_node.name, current_node.crafting_agent.crafting_actions)
                 inner_env = CraftInnerWrapper(InnerEnvWrapper(
-                    env=core_env, item=current_node.name, count=current_node.count),
+                    env=core_env, item=current_node.name, count=current_node.count, last_observation=last_observation),
                     crafts_agent=current_node.crafting_agent)
 
                 t_env = make_env(inner_env, **wrapper_config)
-                t_env.reset()
                 current_node.crafting_agent.reset_index()
                 print('\n', current_node.name, "agent started")
                 if current_node.name in agents_to_train or 'all' in agents_to_train:
@@ -325,14 +303,12 @@ class ItemAgent:
                     reward = current_node.pov_agent.run(t_env)
                 total_reward = save_video_wrapper.get_reward()
                 wandb.log({current_node.name + " reward": reward, "episode": episode})
-
                 if episode % 100 == 0 and episode > 0:
                     current_node.pov_agent.save_agent()
-
                 if inner_env.is_core_env_done or current_node_index >= len(self.nodes):
                     break
-
                 current_node_index += 1
+                last_observation = inner_env.last_observation
 
             wandb.log({"Total reward": total_reward, "episode": episode})
 
