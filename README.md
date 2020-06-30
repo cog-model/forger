@@ -46,7 +46,7 @@ The ```simple_set_config.yaml``` file provides an example config for the Acrobot
 To train ForgER on *Treechop*, run this command:
 
 ```train
-python train_minerl.py --config minerl_config.yaml
+python train_treechop.py --config treechop_config.yaml
 ```
 
 To train ForgER on *MineRL*, run this command:
