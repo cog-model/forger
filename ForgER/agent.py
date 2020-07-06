@@ -85,7 +85,7 @@ class Agent:
             action = self.choose_act(state, epsilon)
             next_state, reward, done, _ = env.step(action)
             score += reward
-            self.perceive(state=state, action=action, reward=reward, next_state=next_state,
+            self.perceive(to_demo=0, state=state, action=action, reward=reward, next_state=next_state,
                           done=done, demo=False)
             counter += 1
             state = next_state
@@ -99,7 +99,6 @@ class Agent:
             self.load(name)
 
         total_reward = 0
-        collected = list()
 
         for trial_index in range(number_of_trials):
             reward = 0
@@ -224,7 +223,7 @@ class Agent:
         all_data = 0
         progress = tqdm(total=self.replay_buff.get_buffer_size())
         for state, action, reward, next_state, done in data.sarsd_iter(1, 400000):
-            self.perceive(state=state, action=action, reward=fixed_reward if fixed_reward else reward,
+            self.perceive(to_demo=1, state=state, action=action, reward=fixed_reward if fixed_reward else reward,
                           next_state=next_state, done=done, demo=int(expert_data))
             progress.update(1)
         print('demo data added to buff')

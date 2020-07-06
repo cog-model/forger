@@ -303,11 +303,11 @@ class ItemAgent:
                     reward = current_node.pov_agent.run(t_env)
                 total_reward = save_video_wrapper.get_reward()
                 wandb.log({current_node.name + " reward": reward, "episode": episode})
+                current_node_index += 1
                 if episode % 100 == 0 and episode > 0:
                     current_node.pov_agent.save_agent()
                 if inner_env.is_core_env_done or current_node_index >= len(self.nodes):
                     break
-                current_node_index += 1
                 last_observation = inner_env.last_observation
 
             wandb.log({"Total reward": total_reward, "episode": episode})
@@ -323,7 +323,8 @@ class ItemAgent:
         pre-train method for ForgER
         :return:
         """
-        sliced_trajectories = self.load_sliced_trajectories(envs=("MineRLObtainIronPickaxeDense-v0",), data_dir='demonstrations')
+        sliced_trajectories = self.load_sliced_trajectories(envs=("MineRLObtainIronPickaxeDense-v0",),
+                                                            data_dir='demonstrations')
         agents_to_train = pretrain_config['agents_to_train']
 
         class DummyDataLoader:

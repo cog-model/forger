@@ -191,8 +191,8 @@ class AggregatedBuff:
         self.episodes_done = 0
         self.min_demo_proportion = min_demo_proportion
 
-    def add(self, **kwargs):
-        if kwargs["demo"] == 1:
+    def add(self, to_demo=0, **kwargs):
+        if to_demo:
             self.demo_buff.add(**kwargs)
         else:
             self.replay_buff.add(**kwargs)

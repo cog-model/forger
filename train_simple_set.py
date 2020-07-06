@@ -1,7 +1,6 @@
 import gym
-import wandb
 from chainerrl.wrappers.atari_wrappers import EpisodicLifeEnv, FireResetEnv, \
-    ScaledFloatFrame, ClipRewardEnv, WarpFrame, \
+    ClipRewardEnv, WarpFrame, \
     MaxAndSkipEnv
 
 from ForgER.agent import *

@@ -6,7 +6,6 @@ import tensorflow as tf
 from ForgER.replay_buff import AggregatedBuff
 from utils.env_wrappers import FrameSkip, FrameStack, ObtainPoVWrapper, TreechopDiscretWrapper
 import yaml
-from collections import defaultdict
 import argparse
 import wandb
 from utils.data_loaders import TreechopLoader

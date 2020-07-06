@@ -134,18 +134,24 @@ class NoisyDense(Dense):
         self.built = True
 
     def call(self, inputs):
-        kernel_input = self.f(K.random_normal(shape=(self.input_dim, 1)))
-        kernel_output = self.f(K.random_normal(shape=(1, self.units)))
+        if inputs.shape[0]:
+            kernel_input = self.f(K.random_normal(shape=(inputs.shape[0], self.input_dim, 1)))
+            kernel_output = self.f(K.random_normal(shape=(inputs.shape[0], 1, self.units)))
+        else:
+            kernel_input = self.f(K.random_normal(shape=(self.input_dim, 1)))
+            kernel_output = self.f(K.random_normal(shape=(1, self.units)))
         kernel_epsilon = tf.matmul(kernel_input, kernel_output)
 
         w = self.kernel + self.kernel_sigma * kernel_epsilon
-        output = K.dot(inputs, w)
+
+        output = tf.matmul(tf.expand_dims(inputs, axis=1), w)
 
         if self.use_bias:
             b = self.bias + self.bias_sigma * kernel_output
             output = output + b
         if self.activation is not None:
             output = self.activation(output)
+        output = tf.squeeze(output, axis=1)
         return output
 
 
