@@ -9,7 +9,7 @@ from pipeline import run_pipeline
 
 
 def run_train(file_name):
-    wandb.init(sync_tensorboard=True, anonymous='allow', project="FSRB", group='hierarchical_tasks_extraction aug')
+    wandb.init(sync_tensorboard=True, anonymous='allow', project="HieAug", group='hierarchical_tasks_extraction aug')
 
     with open('train/chain.json', "r") as f:
         chain = json.load(f)

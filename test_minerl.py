@@ -16,7 +16,7 @@ config_gpu()
 
 
 def run_test(file_name):
-    wandb.init(sync_tensorboard=True, anonymous='allow', project="FSRB", group='test_entry')
+    wandb.init(anonymous='allow', project="ForgER", group='test_entry')
 
 
     with open(file_name, "r") as config_file:
