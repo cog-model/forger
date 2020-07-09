@@ -45,7 +45,7 @@ train_agent:
     steps: 50000
     min_demo_reward: 0.0
     hie_aug: 1
-    agents_to_train: ['all']
+    agents_to_train: ['cobblestone', 'iron_ore']
   train:
     agents_to_train: ['all']
     epsilon: 0.1
