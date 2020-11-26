@@ -2,7 +2,7 @@ agent:
   frames_to_update: 2000
   save_dir: "train/treechop/"
   update_quantity: 600
-  update_target_net_mod: 10000
+  update_target_net_mod: 3000
   batch_size: 32
   margin: 0.4
   replay_start_size: 20000
