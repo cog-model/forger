@@ -177,7 +177,7 @@ def all_chains_info(envs, data_dir):
     return chains
 
 
-def generate_best_chains(envs=("MineRLObtainIronPickaxe-v0",), data_dir="../data/"):
+def generate_best_chains(envs=("MineRLObtainIronPickaxeDense-v0",), data_dir="../data/"):
     """
     generates final chain
     it may sampled randomly, but be careful short chains give poor results
@@ -195,7 +195,7 @@ def generate_best_chains(envs=("MineRLObtainIronPickaxe-v0",), data_dir="../data
     return filtered_chains
 
 
-def generate_final_chain(envs=("MineRLObtainIronPickaxe-v0",), data_dir="../data/"):
+def generate_final_chain(envs=("MineRLObtainIronPickaxeDense-v0",), data_dir="../data/"):
     """
     generates final chain
     it may sampled randomly, but be careful short chains give poor results
