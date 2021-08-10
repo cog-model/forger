@@ -20,7 +20,7 @@ config_gpu()
 def run_train(file_name):
     wandb.init(anonymous='allow', project="ForgER", group='train_entry')
 
-    chain = TrajectoryInformation('demonstrations/MineRLObtainIronPickaxe-v0/v1_rigid_mustard_greens_monster-11_878-4825')
+    chain = TrajectoryInformation('demonstrations/MineRLObtainIronPickaxeDense-v0/v1_rigid_mustard_greens_monster-11_878-4825')
     final_chain = chain.to_old_chain_format(items=chain.chain, return_time_indexes=False)
 
     with open(file_name, "r") as config_file:
