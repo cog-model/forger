@@ -9,13 +9,14 @@ This repository is the TF2.0 implementation of Forgetful Replay Buffer for Reinf
 ## Citation
 If you use this repo in your research, please consider citing the paper as follows
 ```
-@misc{skrynnik2020forgetful,
-    title={Forgetful Experience Replay in Hierarchical Reinforcement Learning from Demonstrations},
-    author={Alexey Skrynnik and Aleksey Staroverov and Ermek Aitygulov and Kirill Aksenov and Vasilii Davydov and Aleksandr I. Panov},
-    year={2020},
-    eprint={2006.09939},
-    archivePrefix={arXiv},
-    primaryClass={cs.LG}
+@article{skrynnik2021forgetful,
+  title={Forgetful experience replay in hierarchical reinforcement learning from expert demonstrations},
+  author={Skrynnik, Alexey and Staroverov, Aleksey and Aitygulov, Ermek and Aksenov, Kirill and Davydov, Vasilii and Panov, Aleksandr I},
+  journal={Knowledge-Based Systems},
+  volume={218},
+  pages={106844},
+  year={2021},
+  publisher={Elsevier}
 }
 ```
 
