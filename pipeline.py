@@ -27,6 +27,7 @@ def wrap_env(environment, frame_skip=4, frame_stack=2, always_attack=1):
 
 
 def run_pipeline(config):
+    print('\n==========================pipeline step1: load wandb and env==========================')
     wandb.init(config=tf.compat.v1.flags.FLAGS, sync_tensorboard=True, anonymous='allow', project="tf2refact",
                group='pipeline')
 
@@ -46,23 +47,39 @@ def run_pipeline(config):
     make_model = get_network_builder('minerl_dqfd')
     env = wrap_env(gym.make("MineRLTreechop-v0"), **wrappers_config)
     env_dict, dtype_dict = get_dtype_dict(env)
+    env_obs = env.observation_space
+    env_act = env.action_space
+    env.close()
+    del env
 
+    print('\n==========================pipeline step2: init buffer and agent==========================')
     replay_buffer = AggregatedBuff(env_dict=env_dict, **config['buffer'])
-    agent = Agent(agent_config, replay_buffer, make_model, env.observation_space,
-                  env.action_space, dtype_dict)
+    agent = Agent(agent_config, replay_buffer, make_model, env_obs,
+                  env_act, dtype_dict)
+    del replay_buffer, make_model, env_obs, env_act, env_dict, dtype_dict
+
+    print('\n==========================pipeline step3: add demo and pretrain==========================')
     agent.add_demo(data_,)
+    del data_
     agent.pre_train(pipeline_config['pretrain']['steps'])
+    print('\npre-train finished')
+
+    print('\n==========================pipeline step4: train agent in Treechop env==========================')
+    env = wrap_env(gym.make("MineRLTreechop-v0"), **wrappers_config)
     summary_writer = tf.summary.create_file_writer('train/')
     with summary_writer.as_default():
         scores_, _ = agent.train(env, name="model.ckpt", **pipeline_config['treechop'])
     env.close()
+    del env
 
-    env = wrap_env(gym.make("MineRLObtainDiamondDense-v0"), **wrappers_config)
+    print('\n==========================pipeline step4: train agent in pickaxe env==========================')
+    env = wrap_env(gym.make("MineRLObtainIronPickaxeDense-v0"), **wrappers_config) #("MineRLObtainIronPickaxeDense-v0")
     summary_writer = tf.summary.create_file_writer('train/')
     with summary_writer.as_default():
         scores_, _ = agent.train(env, name="model.ckpt", **pipeline_config['obtain_diamond'])
     env.close()
 
+    print('\n==========================pipeline finished==========================')
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='pipeline runner')
@@ -71,3 +88,4 @@ if __name__ == '__main__':
     params = parser.parse_args()
     with tf.device('/gpu'):
         run_pipeline(params.config)
+

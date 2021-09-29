@@ -1,17 +1,17 @@
 agent:
-  frames_to_update: 2000
+  frames_to_update: 200 #2000
   save_dir: "train/treechop/"
-  update_quantity: 600
-  update_target_net_mod: 3000
-  batch_size: 32
+  update_quantity: 300 #600
+  update_target_net_mod: 300 #3000
+  batch_size: 16 #32
   margin: 0.4
-  replay_start_size: 20000
+  replay_start_size: 4000 #20000
   gamma: 0.99
   learning_rate: 0.0001
   n_step: 10
 
 buffer:
-  size: 450000
+  size: 70000 #450000
   episodes_to_decay: 50
   min_demo_proportion: 0.
 
@@ -23,7 +23,7 @@ model_name: "minerl_dqfd"
 tb_dir: "train/tboard/"
 
 pretrain:
-  steps: 150000
-  min_demo_reward: 60.0
+  steps: 5000 #150000
+  min_demo_reward: 8.0
 
-episodes: 200
+episodes: 10

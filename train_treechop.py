@@ -19,6 +19,8 @@ config_gpu()
 
 
 def run_treechop(config):
+
+
     wandb.init(config=tf.compat.v1.flags.FLAGS, sync_tensorboard=True, anonymous='allow', project="tf2refact",
                group='pipeline')
 
@@ -33,16 +35,23 @@ def run_treechop(config):
     agent_config['wandb'] = wandb
 
     data_ = minerl.data.make("MineRLTreechop-v0", data_dir='demonstrations')
+    print('shaomu testing--------first data')
+    print(data_)
     data_ = TreechopLoader(data_, threshold=config['pretrain']['min_demo_reward'],
                            **wrappers_config)
     make_model = get_network_builder('minerl_dqfd')
     env = wrap_env(gym.make("MineRLTreechop-v0"), **wrappers_config)
     env_dict, dtype_dict = get_dtype_dict(env)
 
+    print('shaomu testing--------env finished')
+
     replay_buffer = AggregatedBuff(env_dict=env_dict, **config['buffer'])
+    print('shaomu testing--------replay_buffer finished')
     agent = Agent(agent_config, replay_buffer, make_model, env.observation_space,
                   env.action_space, dtype_dict)
+    print('agent build')
     agent.add_demo(data_, )
+    print('agent add demo')
     agent.pre_train(config['pretrain']['steps'])
     summary_writer = tf.summary.create_file_writer('train/')
     with summary_writer.as_default():

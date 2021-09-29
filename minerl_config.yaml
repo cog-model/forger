@@ -40,11 +40,11 @@ log_agent_pipeline:
     episodes: 300
 
 train_agent:
-  env_name: MineRLObtainDiamondDense-v0
+  env_name: MineRLObtainIronPickaxeDense-v0
   pretrain:
     steps: 50000
     min_demo_reward: 0.0
-    hie_aug: 1
+    hie_aug: 0
     agents_to_train: ['cobblestone', 'iron_ore']
   train:
     agents_to_train: ['all']

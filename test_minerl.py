@@ -16,7 +16,7 @@ config_gpu()
 
 
 def run_test(file_name):
-    wandb.init(anonymous='allow', project="ForgER", group='test_entry')
+    wandb.init(anonymous='allow', project="MineRL_pickaxe", group='test_entry')
 
 
     with open(file_name, "r") as config_file:
@@ -30,7 +30,8 @@ def run_test(file_name):
         chain = json.load(f)
 
     item_agent = ItemAgent(chain)
-    item_agent.run(agent_config, wrapper_config, "MineRLObtainDiamond-v0", **test_config)
+
+    item_agent.run(agent_config, wrapper_config, "MineRLObtainIronPickaxe-v0", **test_config)
 
 
 if __name__ == '__main__':
