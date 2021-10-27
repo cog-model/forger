@@ -1,5 +1,34 @@
 # ForgER: Forgetful Expirience Replay for Reinforcement Learning from Demonstrations
 
+
+This repository is the implementation version using Newest MineRL dataset. The original repo and info please see below. 
+
+
+Dependencies:
+
+##### Python == 3.7 
+##### tensorflow == 2.5.1
+##### tensorflow-estimator == 2.3.0
+##### tensorflow-probability == 0.18.0
+##### gym == 0.19.0
+##### chainerrl == 0.8.0
+##### tqdm
+##### cpprb == 9.3.2
+##### opencv-python == 4.4.0.46
+##### pyyaml == 5.4
+##### wandb 
+##### minerl == 0.3.7 
+
+<br>
+
+Please download MineRL dataset through:
+
+##### import minerl
+##### minerl.data.download('demonstrations/') 
+
+<br><br>
+====================================== Original Version ======================================
+
 This repository is the TF2.0 implementation of Forgetful Replay Buffer for Reinforcement Learning from Demonstrations by [Alexey Skrynnik](https://github.com/Tviskaron), [Aleksey Staroverov](https://github.com/alstar8), [Ermek Aitygulov](https://github.com/ermekaitygulov), [Kirill Aksenov](https://github.com/axellkir), [Vasilii Davydov](https://github.com/dexfrost89), [Aleksandr I. Panov](https://github.com/grafft). 
 
 [[Paper]](https://arxiv.org/abs/2006.09939) [[Webpage]](https://sites.google.com/view/forgetful-experience-replay)
