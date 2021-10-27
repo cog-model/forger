@@ -76,18 +76,26 @@ class RfDAgent:
         return self.agent.test(env, None)
 
     def train(self, env):
+
         reward, self.counter = self.agent.train_episode(env, current_step=self.counter,
                                                         epsilon=self.epsilon)
+
         self.epsilon = max(self.final_epsilon, self.epsilon * self.epsilon_decay)
         return reward, self.counter
 
-    def save_agent(self):
-        self.agent.save(self.item_dir + '/model.ckpt')
+    def save_agent(self,pre_train = False):
+        if pre_train == True:
+            self.agent.save(self.item_dir + '/pre_trained_model.ckpt')
+        else:
+            self.agent.save(self.item_dir + '/model.ckpt')
 
-    def load_agent(self):
+    def load_agent(self,pre_train = False):
         print('loading agent now...')
         if os.path.exists(self.item_dir):
-            self.agent.load(self.item_dir + '/model.ckpt')
+            if pre_train == True:
+                self.agent.load(self.item_dir + '/pre_trained_model.ckpt')
+            else:
+                self.agent.load(self.item_dir + '/model.ckpt')
 
         else:
             print('WARNING: No weights in {}'.format(self.item_dir))

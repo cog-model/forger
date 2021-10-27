@@ -20,27 +20,20 @@ config_gpu()
 def run_train(file_name):
     print('==========================step1: prepare wandb and config==========================')
 
-    wandb.init(anonymous='allow', project="1.1_pretrain", group='cobblestone_ironore')
-
-    chain = TrajectoryInformation('demonstrations/MineRLObtainIronPickaxe-v0/v3_rigid_mustard_greens_monster-11_878-4825')
-    final_chain = chain.to_old_chain_format(items=chain.chain, return_time_indexes=False)
-
-    print('finished final_chain')
+    wandb.init(anonymous='allow', project="1.1_pretrain", group='cobblestone_ironore_pc')
 
     with open(file_name, "r") as config_file:
         config = yaml.load(config_file, Loader=yaml.FullLoader)
 
     if not os.path.isdir('train'):
         os.mkdir('train')
-    with open('train/chain.json', "w") as f:
-        json.dump(final_chain, f)
 
     print('==========================step2: load chain==========================')
 
     with open(config['chain_path'], "r") as f:
         chain = json.load(f)
 
-    print('\nwhat is chain:',chain)
+    print('\nwhat is chain:', chain)
 
     print('==========================step3: init an agent with chain==========================')
     item_agent = ItemAgent(chain)

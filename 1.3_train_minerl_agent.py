@@ -20,7 +20,7 @@ config_gpu()
 def run_train(file_name):
     print('==========================step1: prepare wandb and config==========================')
 
-    wandb.init(anonymous='allow', project="1.3_train", group='PC_1.3_Train_all_best_chain')
+    wandb.init(anonymous='allow', project="MineRL_pickaxe", group='PC_1.3_26_Oct')
 
     with open(file_name, "r") as config_file:
         config = yaml.load(config_file, Loader=yaml.FullLoader)
@@ -48,9 +48,10 @@ def run_train(file_name):
     item_agent.load_agents(agent_config, buffer_config, wrapper_config,
                              train_config['env_name'], train_config['pretrain'])
 
-    print('==========================step5: train agent==========================')
     if 'train' in train_config:
         item_agent.train(agent_config, buffer_config, wrapper_config, train_config['env_name'], **train_config['train'])
+
+
 
 
 if __name__ == '__main__':

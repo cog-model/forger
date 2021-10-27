@@ -47,6 +47,7 @@ class Agent:
         self._schedule_dict[self.update_log] = log_freq
         self.avg_metrics = dict()
         self.action_dim = act_space.n
+        self.act_space = act_space
 
     def train(self, env, episodes=200, seeds=None, name="max_model.ckpt", save_mod=50,
               epsilon=0.1, final_epsilon=0.01, eps_decay=0.99, save_window=10):
@@ -73,17 +74,25 @@ class Agent:
                 self.save(os.path.join(self.save_dir, name))
             if e % save_mod == 0:
                 self.save(os.path.join(self.save_dir, "{}_model.ckpt".format(e)))
-        return scores, counter
+        return scores
 
     def train_episode(self, env, seeds=None, current_step=0, epsilon=0.0):
-        counter = current_step
+        counter = 0
         if current_step == 0:
             self.target_update()
         if seeds:
             env.seed(random.choice(seeds))
         done, score, state = False, 0, env.reset()
+
+        # template_action = self.act_space #env.action_space.noop()
+
         while done is False:
             action = self.choose_act(state, epsilon)
+
+            #if current_task == 'wodden_pickaxe':
+            #    action = template_action['nearbyCraft'] = 'wooden_pickaxe'
+            #    print('\nwooden pickaxe manully!!!!!!!!!!!!')
+
             next_state, reward, done, _ = env.step(action)
             score += reward
             self.perceive(to_demo=0, state=state, action=action, reward=reward, next_state=next_state,
@@ -93,7 +102,7 @@ class Agent:
             if self.replay_buff.get_stored_size() > self.replay_start_size \
                     and counter % self.frames_to_update == 0:
                 self.update(self.update_quantity)
-        return score, counter
+        return score,counter
 
     def test(self, env, name="train/max_model.ckpt", number_of_trials=1, render=False):
         if name:
@@ -226,7 +235,7 @@ class Agent:
     def add_demo(self, data, expert_data=1, fixed_reward=None):
         all_data = 0
         progress = tqdm(total=self.replay_buff.get_buffer_size())
-        for state, action, reward, next_state, done in data.sarsd_iter(1, 400000):#400000
+        for state, action, reward, next_state, done in data.sarsd_iter(1, 400000):
             all_data+=1
 
             self.perceive(to_demo=1, state=state, action=action, reward=fixed_reward if fixed_reward else reward,

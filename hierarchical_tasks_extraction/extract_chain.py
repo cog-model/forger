@@ -200,13 +200,15 @@ def generate_best_chains(envs=("MineRLObtainIronPickaxe-v0",), data_dir="../data
     :return:
     """
     chains = all_chains_info(envs=envs, data_dir=data_dir)
+
+
     filtered = [c for c in chains if c.reward == max([_.reward for _ in chains])]
     filtered = [c for c in sorted(filtered, key=lambda x: x.length)][:60]
     filtered = [c for c in sorted(filtered, key=lambda x: len(x.chain)) if 25 < len(c.chain) <= 31]
     filtered_chains = []
     for chain in filtered:
         filtered_chains.append(chain.chain)
-    return filtered_chains
+    return filtered_chains,chains
 
 
 def generate_final_chain(envs=("MineRLObtainIronPickaxe-v0",), data_dir="../data/"):
@@ -217,4 +219,4 @@ def generate_final_chain(envs=("MineRLObtainIronPickaxe-v0",), data_dir="../data
     :param data_dir:
     :return:
     """
-    return generate_best_chains(envs=envs, data_dir=data_dir)[-1]
+    return generate_best_chains(envs=envs, data_dir=data_dir) #[-1]

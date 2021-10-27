@@ -115,8 +115,6 @@ class InnerEnvWrapper(gym.Wrapper):
         if self.item not in state['inventory']:
             state['inventory'][self.item] = 0
         if state['inventory'][self.item] >= self.count:
-            print('\ninv finished, item is: ', self.item)
-            print('\ninv finished: ', state['inventory'][self.item], self.count)
             done = True
 
         if self.previous_count is not None and self.previous_count < state['inventory'][self.item]:
@@ -127,8 +125,8 @@ class InnerEnvWrapper(gym.Wrapper):
 
 # print wrapper
 class InventoryPrintWrapper(gym.Wrapper):
-    def __init__(self, env, items=("log", "cobblestone", "planks", "stick", "wooden_pickaxe", "crafting_table", "dirt",
-                                   "stone_pickaxe", "iron_ore", "furnace", "iron_pickaxe",)):
+    def __init__(self, env, items=("log", "planks","crafting_table", "stick", "wooden_pickaxe", "dirt", "cobblestone", "stone",
+                                   "coal", "stone_pickaxe", "iron_ore", "furnace", "iron_ingot", "iron_pickaxe",)):
         super().__init__(env)
         self.items = items
         self.inventory = None
@@ -256,7 +254,7 @@ class ItemAgent:
         return nodes
 
     def train(self, agent_config, buffer_config, wrapper_config,
-              env_name="MineRLObtainIronPickaxeDense-v0", episodes=100,
+              env_name="MineRLObtainDiamond-v0", episodes=100,
               agents_to_train=("cobblestone", "iron_ore"), **eps_kwargs):
         """
         training method
@@ -276,6 +274,7 @@ class ItemAgent:
         wandb = agent_config["wandb"]
 
         #load node.pov_agent
+        print('==============================Load agent(s) now==============================')
         for node in self.nodes:
             if node.name not in self.pov_agents:
                 print('----' * 10)
@@ -291,14 +290,24 @@ class ItemAgent:
             node.pov_agent = self.pov_agents[node.name]
 
         for episode in range(episodes):
+
+            print('\n==============================This is the episode {}=============================='.format(episode))
+
             current_node_index = 0
-            count_time_steps = 0
             for agent in self.nodes:
                 agent.crafting_agent.reset_index()
             last_observation = core_env.reset()
 
+            accu_timestep =0
+            record = defaultdict()
+            for node in self.nodes:
+                record[str(node.name)] = defaultdict(list)
+                record[str(node.name)]['reward'] = 0
+                record[str(node.name)]['timestep'] = 0
+
+            episode_timestep = 0
+
             while True:
-                timestep_ = 0
                 current_node = self.nodes[current_node_index]
                 inner_env = CraftInnerWrapper(InnerEnvWrapper(
                     env=core_env, item=current_node.name, count=current_node.count, last_observation=last_observation),
@@ -306,44 +315,55 @@ class ItemAgent:
                 t_env = make_env(inner_env, **wrapper_config)
 
                 current_node.crafting_agent.reset_index()
-                print('\n', current_node.name, "agent started")
+
+                print('\nNow is {} agent.'.format(current_node.name))
 
                 if current_node.name in agents_to_train or 'all' in agents_to_train:
-                    reward,timestep_ = current_node.pov_agent.train(t_env)
+                    reward, timestep_record = current_node.pov_agent.train(t_env)
                 else:
-                    reward,timestep_ = current_node.pov_agent.run(t_env)
+                    reward, timestep_record = current_node.pov_agent.run(t_env)
 
                 total_reward = save_video_wrapper.get_reward()
-                count_time_steps += timestep_
+                timestep_record = timestep_record*4
 
-                #print('\ninner_env_steps: ', inner_env.count_steps)
-                #print('\ncount_time_steps: ', count_time_steps)
+                print('\ntimestep_record is: ',timestep_record)
+                accu_timestep += timestep_record
+                episode_timestep += timestep_record
 
-                print(inner_env.last_observation['inventory'])
-                #wandb.log(({" Num_" + current_node.name: int(inner_env.last_observation['inventory'][current_node.name]), "episode": episode}))
-                wandb.log({current_node.name + " reward": reward, "episode": episode, current_node.name + " time_step": inner_env.count_steps})
-                #wandb.log({current_node.name + " timesteps": timestep_, "episode": episode})
+                record[str(current_node.name)]['reward']=reward
+                record[str(current_node.name)]['timestep'] = accu_timestep#inner_env.count_steps
 
                 current_node_index += 1
                 if episode % 100 == 0 and episode > 0:
-                    current_node.pov_agent.save_agent()
+                    if current_node.name in ['log', 'cobblestone', 'iron_ore']:
+                        current_node.pov_agent.save_agent(pre_train = False)
 
                 if inner_env.is_core_env_done or current_node_index >= len(self.nodes):
-                    #print('\nNow break, inner_env.is_core_env_done is: ',inner_env.is_core_env_done)
-                    #print('\nNow break, current node index and len(self.node is: ', current_node_index, len(self.nodes))
-                    #print('\nNow break: inner_env.count, inner_env.item: ',inner_env.count,inner_env.item)
-                    #
-                    #print(inner_env.last_observation['inventory'])
-
-                    break #to turn off the timelimit (need more change)
+                    break
                 last_observation = inner_env.last_observation
-            print(inner_env.count_steps)
 
-            print('count time_steps: ', count_time_steps)
+            print('\nrecord is:\n',record)
+
+            for i in record:
+                if record[i]['reward']!=0:
+                    wandb.log({i + " reward": record[i]['reward'], "episode": episode, i + " time_step": record[i]['timestep']})
+                else:
+                    wandb.log({i + " reward": record[i]['reward'], "episode": episode, i + " time_step": 0})
+
+            #keys, values = zip(*inner_env.last_observation['inventory'].items())
+            #values = tuple(int(i) for i in values)
+            #for i in range(len(keys)):
+            #    wandb.log({"Item "+ keys[i]: values[i], "episode": episode})
             wandb.log({"Total reward": total_reward, "episode": episode})
 
+
+            print('\nThe timestep of the whole episode is: ', episode_timestep)
+
+            print('==============================This is the episode {}=============================='.format(episode))
+
+
     def run(self, agent_config, wrapper_config,
-            env_name="MineRLObtainIronPickaxeDense-v0", episodes=100):
+            env_name="MineRLObtainDiamond-v0", episodes=100):
         return self.train(agent_config, None, wrapper_config,
                           env_name, episodes, agents_to_train=(), epsilon=0.01)
 
@@ -388,7 +408,7 @@ class ItemAgent:
 
             data = DummyDataLoader(data=sliced_trajectories, items_to_add=[node.name])
             data = TreechopLoader(data, **wrapper_config, threshold=pretrain_config['min_demo_reward'])
-            node.pov_agent.agent.add_demo(data) #errors in this step
+            node.pov_agent.agent.add_demo(data)
             print('pre-train node.pov_agent.agent.add_demo(data.data) finished.......')
             if pretrain_config['hie_aug']:
                 all_except_current = [name for name in sliced_trajectories if name != node.name]
@@ -400,12 +420,12 @@ class ItemAgent:
 
             print(f'Pre-training {node.name} agent')
             node.pov_agent.agent.pre_train(pretrain_config['steps'])
-            node.pov_agent.save_agent()
+            node.pov_agent.save_agent(pre_train = True)
             self.pov_agents[node.name] = node.pov_agent
             print('{} agent finished'.format(node.name))
 
     def load_agents(self, agent_config, buffer_config, wrapper_config,
-                  env_name, pretrain_config):
+                  env_name, pretrained=False):
 
         test_env = gym.make(env_name)
         test_env = make_env(test_env, **wrapper_config)
@@ -423,20 +443,23 @@ class ItemAgent:
                                       obs_space=obs_space, act_space=act_space,
                                       dtype_dict=dtype_dict)
 
-            node.pov_agent.load_agent()
+            if pretrained==False:
+                node.pov_agent.load_agent()
+            else:
+                node.pov_agent.load_agent()
             print('{} agent finished'.format(node.name))
 
         print('----------load agents finished----------')
 
 
     @staticmethod
-    def load_sliced_trajectories(envs, data_dir, max_trajectories_to_load=16):
+    def load_sliced_trajectories(envs, data_dir, max_trajectories_to_load=30):
         result = defaultdict(list)
 
         uploaded = 0
         for env in envs:
             path_to_trajectories = os.path.join(data_dir, env)
-            for trajectory_name in TrajectoryDataPipeline.get_trajectory_names(path_to_trajectories):
+            for trajectory_name in tqdm.tqdm(TrajectoryDataPipeline.get_trajectory_names(path_to_trajectories)):
                 uploaded += 1
                 if uploaded >= max_trajectories_to_load:
                     break

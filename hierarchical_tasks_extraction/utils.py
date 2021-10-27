@@ -114,6 +114,8 @@ class TrajectoryDataPipeline:
         action_dict_v2 = rename(action_dict_v2, 'action$sneak', 'action_sneak')
         action_dict_v2 = collections.OrderedDict(action_dict_v2)
 
+        # action_dict = action_dict_v2 except key names
+
         actions = list(action_dict_v2.keys())
 
         action_data = [None for _ in actions]
@@ -148,6 +150,7 @@ class TrajectoryDataPipeline:
         info_dict_mainhand_v1.update({'observation_inventory': np.array(list(info_dict_inv_v1.values()))})
         info_dict_mainhand_v1['observation_inventory'] = info_dict_mainhand_v1['observation_inventory'].T
 
+        # info_dict = deepcopy(info_dict_mainhand_v1)
         info_dict_mainhand_v1 = collections.OrderedDict(info_dict_mainhand_v1)
 
         # info_dict_mainhand_v1 is the correct form of info_dict, inv is also correct[Varified]
