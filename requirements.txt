@@ -1,4 +1,4 @@
-tensorflow-gpu==2.5.1
+tensorflow-gpu==2.5.2
 tensorflow-estimator==2.3.0
 tensorflow-probability==0.13.0
 gym==0.17.3
