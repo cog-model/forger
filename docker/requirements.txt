@@ -1,0 +1,8 @@
+minerl>=0.4
+opencv-python
+PyYAML
+pydantic
+scipy
+pyglet
+tensorflow>=2.8.0
+wandb

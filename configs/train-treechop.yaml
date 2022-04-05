@@ -1,0 +1,19 @@
+pipeline:
+  - environment: MineRLTreechop-v0
+    from_scratch: True
+    pretrain_num_updates: 100000
+
+    source: expert
+    agent_type: flat
+    cfg:
+      agent:
+        save_dir: train/treechop/
+
+  - environment: MineRLTreechop-v0
+    max_train_steps: 1000000
+
+    source: agent
+    agent_type: flat
+    cfg:
+      agent:
+        save_dir: train/treechop/
