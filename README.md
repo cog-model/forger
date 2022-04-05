@@ -6,55 +6,55 @@ This repository is the TF2.0 implementation of Forgetful Replay Buffer for Reinf
 
 ![Forging phase](static/forging.png)
 
-## Citation
-If you use this repo in your research, please consider citing the paper as follows
-```
-@article{skrynnik2021forgetful,
-  title={Forgetful experience replay in hierarchical reinforcement learning from expert demonstrations},
-  author={Skrynnik, Alexey and Staroverov, Aleksey and Aitygulov, Ermek and Aksenov, Kirill and Davydov, Vasilii and Panov, Aleksandr I},
-  journal={Knowledge-Based Systems},
-  volume={218},
-  pages={106844},
-  year={2021},
-  publisher={Elsevier}
-}
-```
 
-## Requirements
+
+## Installation
 
 To install requirements:
 
 ```setup
-pip install -r requirements.txt
+pip install -r docker/requirements.txt
 ```
 
-## Demonstrations 
-For a set of simple environments, most of the expert data is already in the demonstrations folder.
-To train ForgER on *MineRL* domain you need to put expert data in the ```demonstrations``` folder.
+## Evaluating ForgER++
+
+To download pretrained weights:
+```shell
+python utils/load_weights.py
+```
+
+To run evaluation in *ObtainDiamond* task:
+```shell
+python main.py --config configs/eval-diamond.yaml
+```
+
+To run evaluation in *Treechop* task: 
+```shell
+python main.py --config configs/eval-treechop.yaml
+```
+
 
 ## Training
 
-To train ForgER on *Simple set*, run this command:
+Downloading MineRL dataset:
 
 ```train
-python train_simple_set.py --config simple_set_config.yaml
+python utils/load_demonstrations.py 
 ```
-You can change the environment and the path to expert data in the config. 
-The ```simple_set_config.yaml``` file provides an example config for the Acrobot-v1 environment. 
 
-
-
-To train ForgER on *Treechop*, run this command:
+Training ForgER on *Treechop* task: 
 
 ```train
-python train_treechop.py --config treechop_config.yaml
+python main.py --config configs/train-treechop.yaml
 ```
 
-To train ForgER on *MineRL*, run this command:
+Training ForgER on *ObtainDiamondDense* task: 
 
 ```train
-python train_minerl.py --config minerl_config.yaml
+python main.py --config configs/train-diamond.yaml
 ```
+**Caution:** We don't test reproducibility  after moving to TF2 version and updating code for MineRL version 0.4.   
+
 
 ## Results on MineRLObtainDiamond-v0 (1000 seeds)
 
@@ -73,3 +73,17 @@ python train_minerl.py --config minerl_config.yaml
 | iron pickaxe | 12 | 43 | **83** |
 | diamond | 0 | 0 | **1** |
 | mean reward | 57.701 | 74.09 | **104.315** |
+
+## Citation
+If you use this repo in your research, please consider citing the paper as follows:
+```
+@article{skrynnik2021forgetful,
+  title={Forgetful experience replay in hierarchical reinforcement learning from expert demonstrations},
+  author={Skrynnik, Alexey and Staroverov, Aleksey and Aitygulov, Ermek and Aksenov, Kirill and Davydov, Vasilii and Panov, Aleksandr I},
+  journal={Knowledge-Based Systems},
+  volume={218},
+  pages={106844},
+  year={2021},
+  publisher={Elsevier}
+}
+```

@@ -1,0 +1,147 @@
+pipeline:
+  - environment: MineRLTreechop-v0
+    from_scratch: True
+    pretrain_num_updates: 100000
+
+    source: expert
+    agent_type: flat
+    cfg:
+      agent:
+        save_dir: "train/diamond/log"
+
+  - environment: MineRLTreechop-v0
+    from_scratch: False
+    max_train_steps: 1000000
+
+    source: agent
+    agent_type: flat
+    cfg:
+      agent:
+        save_dir: "train/diamond/log"
+
+
+  - environment: MineRLObtainDiamondDense-v0
+    from_scratch: False
+    agent_type: hierarchical
+    max_train_steps: 1000000
+    source: agent
+    cfg:
+      wrappers:
+        render: True
+      agent:
+        save_dir: 'train/diamond/'
+        initial_epsilon:  0.05
+        final_epsilon:  0.01
+    subtasks:
+      - item_count: 7
+        item_name: log
+
+      - actions:
+          - name: craft
+            target: planks
+
+        item_count: 28
+        item_name: planks
+
+      - actions:
+          - name: craft
+            target: crafting_table
+
+        item_count: 1
+        item_name: crafting_table
+
+      - actions:
+          - name: craft
+            target: stick
+        item_count: 8
+        item_name: stick
+
+      - actions:
+          - name: place
+            target: crafting_table
+          - name: nearbyCraft
+            target: wooden_pickaxe
+
+        item_count: 1
+        item_name: wooden_pickaxe
+
+      - actions:
+          - name: craft
+            target: crafting_table
+        item_count: 1
+        item_name: crafting_table
+
+      - actions:
+          - name: equip
+            target: wooden_pickaxe
+
+        item_count: 14
+        item_name: cobblestone
+
+      - actions:
+          - name: craft
+            target: crafting_table
+        item_count: 1
+        item_name: crafting_table
+
+      - actions:
+          - name: place
+            target: crafting_table
+          - name: nearbyCraft
+            target: stone_pickaxe
+
+        item_count: 1
+        item_name: stone_pickaxe
+
+      - actions:
+          - name: equip
+            target: stone_pickaxe
+
+        item_count: 3
+        item_name: iron_ore
+
+
+      - actions:
+          - name: craft
+            target: crafting_table
+        item_count: 1
+        item_name: crafting_table
+
+      - actions:
+          - name: place
+            target: crafting_table
+          - name: nearbyCraft
+            target: furnace
+
+        item_count: 1
+        item_name: furnace
+
+      - actions:
+          - name: place
+            target: furnace
+
+        item_count: 3
+        item_name: iron_ore
+
+      - actions:
+          - name: nearbySmelt
+            target: iron_ingot
+
+        item_count: 3
+        item_name: iron_ingot
+
+      - actions:
+          - name: nearbyCraft
+            target: iron_pickaxe
+
+        item_count: 1
+        item_name: iron_pickaxe
+
+      - action:
+          - name: equip
+            target: iron_pickaxe
+        item_count: 1
+        item_name: diamond
+
+
+

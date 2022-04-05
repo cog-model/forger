@@ -1,0 +1,7 @@
+FROM tensorflow/tensorflow:latest-gpu
+
+RUN apt-get update && apt-get install software-properties-common -y
+RUN add-apt-repository -y ppa:openjdk-r/ppa && apt-get update && apt-get install -y openjdk-8-jdk
+
+ADD requirements.txt /tmp/
+RUN pip install -r /tmp/requirements.txt
