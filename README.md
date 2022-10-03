@@ -54,7 +54,7 @@ Training ForgER on *ObtainDiamondDense* task:
 ```train
 python main.py --config configs/train-diamond.yaml
 ```
-**Caution:** We don't test reproducibility  after moving to TF2 version and updating code for MineRL version 0.4.   
+**Caution:** We didn't test reproducibility of results after moving to TF2 version and updating code for MineRL version 0.4.   
 
 
 ## Results on MineRLObtainDiamond-v0 (1000 seeds)
